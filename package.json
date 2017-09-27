@@ -1,0 +1,16 @@
+{
+  "name": "chatapi",
+  "version": "0.0.1",
+  "description": "rest service for chat socket io",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "duytq",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.15.5",
+    "mysql": "^2.14.1"
+  }
+}
