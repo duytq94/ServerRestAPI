@@ -1,11 +1,15 @@
 var connection = require('../connection');
   
 function Todo() {
-  this.get = function(groupId,res) {
+  this.get = function(groupId, page, pageSize, res) {
     connection.acquire(function(err, con) {
-      con.query('select * from archive where to_group = ?', [groupId], function(err, result) {
-        con.release();
 
+    	page = parseInt(page);
+    	pageSize = parseInt(pageSize);
+
+      con.query('select * from archive where to_group = ? limit ?, ?', [groupId, page*pageSize, pageSize], function(err, result) {
+        con.release();
+     
         if (!err) {
         	 res.json(
                 {
@@ -14,6 +18,7 @@ function Todo() {
                     'errors': null
                 }
             );
+   
         } else {
         	res.json(
                 {
@@ -25,6 +30,7 @@ function Todo() {
                     }]
                 }
             );
+            throw err;
 		}
         // res.send(result);
       });
