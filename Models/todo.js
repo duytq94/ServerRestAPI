@@ -4,10 +4,10 @@ function Todo() {
   this.get = function(groupId, page, pageSize, res) {
     connection.acquire(function(err, con) {
 
-    	page = parseInt(page);
+    	page = parseInt(page) - 1;
     	pageSize = parseInt(pageSize);
 
-      con.query('select * from archive where to_group = ? limit ?, ?', [groupId, page*pageSize, pageSize], function(err, result) {
+      con.query('SELECT * FROM (SELECT * FROM archive WHERE to_group = ? ORDER BY id DESC LIMIT ?, ?) sub ORDER BY id ASC', [groupId, page * pageSize, pageSize], function(err, result) {
         con.release();
      
         if (!err) {
