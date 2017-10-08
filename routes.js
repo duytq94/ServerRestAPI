@@ -9,7 +9,11 @@ module.exports = {
 
     app.get('/status/:groupId', function(req, res) {
     	todo.getStatus(req.params.groupId, res);
-    })
+    });
+
+    app.get('/last_location/:groupId', function(req, res) {
+    	todo.getLastLocation(req.params.groupId, res);
+    });
 
   }
 };	

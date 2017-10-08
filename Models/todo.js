@@ -30,11 +30,11 @@ function Todo() {
                         }]
                     }
                 );
-                throw err;
+                console.log(err);
     		}
       });
     });
-  };
+  }
 
   this.getStatus = function(groupId, res) {
     connection.acquire(function(err, conn) {
@@ -60,10 +60,37 @@ function Todo() {
                         }]
                     }
                 );
-                throw err;
+                console.log(err);
             }
-        })
-    })
+        });
+    });
+  }
+
+  this.getLastLocation = function(groupId, res) {
+    connection.acquire(function(err, conn) {
+        conn.query('SELECT * FROM last_location WHERE to_group = ?', [groupId], function(err, result) {
+            conn.release();
+            if (!err) {
+                res.json({
+                    'data': result,
+                    'error': false,
+                    'errors': null
+                });
+            } else {
+                res.json(
+                    {
+                        'data': null,
+                        'error': true,
+                        'errors': [{
+                            'errorCode': 9011,
+                            'errorMessage': 'Something error'
+                        }]
+                    }
+                );
+                console.log(err);
+            }
+        });
+    });
   }
 
 }
