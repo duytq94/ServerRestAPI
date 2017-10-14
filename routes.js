@@ -8,12 +8,15 @@ module.exports = {
     });
 
     app.get('/status/:groupId', function(req, res) {
-    	todo.getStatus(req.params.groupId, res);
+        todo.getStatus(req.params.groupId, res);
     });
 
     app.get('/last_location/:groupId', function(req, res) {
-    	todo.getLastLocation(req.params.groupId, res);
+        todo.getLastLocation(req.params.groupId, res);
     });
 
+    app.get('/deal/:where', function(req, res) {
+        todo.getDeal(req.params.where, req.query.page, req.query.pageSize, res);
+    });
   }
-};	
+};

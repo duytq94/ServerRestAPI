@@ -36,6 +36,41 @@ function Todo() {
     });
   }
 
+  this.getDeal = function(where, page, pageSize, res) {
+    connection.acquire(function(err, conn) {
+
+        page = parseInt(page) - 1;
+        pageSize = parseInt(pageSize);
+
+        conn.query('SELECT * FROM (SELECT * FROM deal WHERE title LIKE ? ORDER BY id DESC LIMIT ?, ?) sub ORDER BY id ASC', ["%" + where + "%", page * pageSize, pageSize], function(err, result) {
+            conn.release();
+         
+            if (!err) {
+                 res.json(
+                    {
+                        'data': result,
+                        'error': false,
+                        'errors': null
+                    }
+                );
+       
+            } else {
+                res.json(
+                    {
+                        'data': null,
+                        'error': true,
+                        'errors': [{
+                            'errorCode': 9011,
+                            'errorMessage': 'Something error'
+                        }]
+                    }
+                );
+                console.log(err);
+            }
+      });
+    });
+  }
+
   this.getStatus = function(groupId, res) {
     connection.acquire(function(err, conn) {
         conn.query('SELECT * FROM users WHERE to_group = ? ', [groupId], function(err, result) {
