@@ -18,5 +18,9 @@ module.exports = {
     app.get('/deal/:where', function(req, res) {
         todo.getDeal(req.params.where, req.query.page, req.query.pageSize, res);
     });
+
+    app.get('/trend', function(req, res) {
+        todo.getTrend(req.query.page, req.query.pageSize, res);
+    });
   }
 };
