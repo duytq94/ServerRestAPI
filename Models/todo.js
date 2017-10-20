@@ -42,7 +42,7 @@ function Todo() {
         page = parseInt(page) - 1;
         pageSize = parseInt(pageSize);
 
-        conn.query('SELECT * FROM (SELECT * FROM deal WHERE title LIKE ? ORDER BY id DESC LIMIT ?, ?) sub ORDER BY id ASC', ["%" + where + "%", page * pageSize, pageSize], function(err, result) {
+        conn.query('SELECT * FROM deal WHERE title LIKE ? ORDER BY id DESC LIMIT ?, ?', ["%" + where + "%", page * pageSize, pageSize], function(err, result) {
             conn.release();
          
             if (!err) {
@@ -167,9 +167,9 @@ function Todo() {
     connection.acquire(function(err, conn) {
         conn.query('UPDATE trend SET ? WHERE id = ?', [body, body.id], function(err, result) {
             conn.release();
-             if (!err) {
+             if (!err && result.affectedRows == 1) {
                 res.json({
-                    'data': result,
+                    'data': "update success",
                     'error': false,
                     'errors': null
                 });
