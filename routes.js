@@ -22,5 +22,9 @@ module.exports = {
     app.get('/trend', function(req, res) {
         todo.getTrend(req.query.page, req.query.pageSize, res);
     });
+
+    app.put('/trend/update_count', function(req, res) {
+        todo.updateTrendCount(req.body, res)
+    });
   }
 };

@@ -163,5 +163,32 @@ function Todo() {
     });
   }
 
+  this.updateTrendCount = function(body, res) {
+    connection.acquire(function(err, conn) {
+        conn.query('UPDATE trend SET ? WHERE id = ?', [body, body.id], function(err, result) {
+            conn.release();
+             if (!err) {
+                res.json({
+                    'data': result,
+                    'error': false,
+                    'errors': null
+                });
+            } else {
+                res.json(
+                    {
+                        'data': null,
+                        'error': true,
+                        'errors': [{
+                            'errorCode': 9011,
+                            'errorMessage': 'Something error'
+                        }]
+                    }
+                );
+                console.log(err);
+            }
+        });
+    });
+  }
+
 }
 module.exports = new Todo();
