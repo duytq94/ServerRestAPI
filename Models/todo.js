@@ -42,7 +42,14 @@ function Todo() {
         page = parseInt(page) - 1;
         pageSize = parseInt(pageSize);
 
-        conn.query('SELECT * FROM deal WHERE title LIKE ? ORDER BY id DESC LIMIT ?, ?', ["%" + where + "%", page * pageSize, pageSize], function(err, result) {
+        var strQuery;
+        if (where != "") {
+            strQuery = 'SELECT * FROM deal WHERE title LIKE "%' + where + '%" ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+        } else {
+            strQuery = 'SELECT * FROM deal ORDER BY count_view DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+        }
+
+        conn.query(strQuery, function(err, result) {
             conn.release();
          
             if (!err) {
@@ -71,13 +78,20 @@ function Todo() {
     });
   }
 
-    this.getTrend = function(page, pageSize, res) {
+    this.getTrend = function(where, page, pageSize, res) {
     connection.acquire(function(err, conn) {
 
         page = parseInt(page) - 1;
         pageSize = parseInt(pageSize);
 
-        conn.query('SELECT * FROM trend ORDER BY id DESC LIMIT ?, ?', [page * pageSize, pageSize], function(err, result) {
+        var strQuery;
+        if (where != "") {
+            strQuery = 'SELECT * FROM trend WHERE title LIKE "%' + where + '%" ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+        } else {
+            strQuery = 'SELECT * FROM trend ORDER BY count_view DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+        }
+
+        conn.query(strQuery, function(err, result) {
             conn.release();
          
             if (!err) {

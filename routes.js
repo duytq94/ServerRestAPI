@@ -15,15 +15,15 @@ module.exports = {
         todo.getLastLocation(req.params.groupId, res);
     });
 
-    app.get('/deal/:where', function(req, res) {
-        todo.getDeal(req.params.where, req.query.page, req.query.pageSize, res);
+    app.get('/deal', function(req, res) {
+        todo.getDeal(req.query.where, req.query.page, req.query.pageSize, res);
     });
 
     app.get('/trend', function(req, res) {
-        todo.getTrend(req.query.page, req.query.pageSize, res);
+        todo.getTrend(req.query.where, req.query.page, req.query.pageSize, res);
     });
 
-    app.put('/trend/update_count', function(req, res) {
+    app.put('/trend/updateCount', function(req, res) {
         todo.updateTrendCount(req.body, res)
     });
   }
