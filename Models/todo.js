@@ -36,18 +36,13 @@ function Todo() {
     });
   }
 
-  this.getDeal = function(where, page, pageSize, res) {
+  this.getDeal = function(where, priceMin, priceMax, dayMin, dayMax, page, pageSize, res) {
     connection.acquire(function(err, conn) {
 
         page = parseInt(page) - 1;
         pageSize = parseInt(pageSize);
 
-        var strQuery;
-        if (where != "") {
-            strQuery = 'SELECT * FROM deal WHERE title LIKE "%' + where + '%" ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
-        } else {
-            strQuery = 'SELECT * FROM deal ORDER BY count_view DESC LIMIT ' + page * pageSize + ', ' + pageSize;
-        }
+        var strQuery = 'SELECT * FROM deal WHERE title LIKE "%' + where + '%" AND price BETWEEN ' + priceMin + ' AND ' + priceMax + ' AND during_day BETWEEN ' + dayMin + ' AND ' + dayMax + ' ORDER BY count_view DESC LIMIT ' + page * pageSize + ', ' + pageSize;
 
         conn.query(strQuery, function(err, result) {
             conn.release();

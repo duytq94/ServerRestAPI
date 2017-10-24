@@ -16,7 +16,7 @@ module.exports = {
     });
 
     app.get('/deal', function(req, res) {
-        todo.getDeal(req.query.where, req.query.page, req.query.pageSize, res);
+        todo.getDeal(req.query.where, req.query.priceMin, req.query.priceMax, req.query.dayMin, req.query.dayMax, req.query.page, req.query.pageSize, res);
     });
 
     app.get('/trend', function(req, res) {
