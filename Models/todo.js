@@ -117,7 +117,7 @@ function Todo() {
 
   this.getStatus = function(groupId, res) {
     connection.acquire(function(err, conn) {
-        conn.query('SELECT * FROM users WHERE to_group = ? ', [groupId], function(err, result) {
+        conn.query('SELECT * FROM user_chat WHERE to_group = ? ', [groupId], function(err, result) {
             conn.release();
             if (!err) {
                  res.json(
@@ -178,7 +178,7 @@ function Todo() {
             conn.release();
              if (!err && result.affectedRows == 1) {
                 res.json({
-                    'data': "update success",
+                    'data': "Update success",
                     'error': false,
                     'errors': null
                 });
@@ -194,6 +194,134 @@ function Todo() {
                     }
                 );
                 console.log(err);
+            }
+        });
+    });
+  }
+
+  this.createPlan = function(body, res) {
+    connection.acquire(function(err, conn) {
+        var count = 0;
+        // Random id for plan
+        var id = Math.floor((Math.random() * 1000000000) + 1);
+        var sqlPlan = 'INSERT INTO plan (id, name, destination, date_go, date_back, id_background, id_user_make_plan, avatar_user_make_plan, username_user_make_plan) VALUES (' + id + ', "' + body.name + '", "' + body.destination + '", "' + body.date_go + '", "' + body.date_back + '", ' + body.id_background + ', ' + body.id_user_make_plan + '", "' + body.avatar_user_make_plan + '", "' + body.username_user_make_plan + ')';
+        conn.query(sqlPlan, function(err, result) {
+            conn.release();
+            if (!err) {
+                sendResponse();
+            } else {
+                res.json(
+                    {
+                        'data': null,
+                        'error': true,
+                        'errors': [{
+                            'errorCode': 9011,
+                            'errorMessage': 'Something error'
+                        }]
+                    }
+                );
+                console.log(err);
+                return;
+            }
+        });
+
+        var sqlSchedule = 'INSERT INTO plan_schedule (content, title, timestamp, id_plan) VALUES ?';
+        var values = [];
+        for (i = 0; i < body.plan_schedule_list.length; i++) {
+            var item = [body.plan_schedule_list[i].content, body.plan_schedule_list[i].title, body.plan_schedule_list[i].timestamp, id];
+            values.push(item);
+        }
+        conn.query(sqlSchedule, [values], function(err, result) {
+            conn.release();
+            if (!err) {
+                sendResponse();
+            } else {
+                res.json(
+                    {
+                        'data': null,
+                        'error': true,
+                        'errors': [{
+                            'errorCode': 9011,
+                            'errorMessage': 'Something error'
+                        }]
+                    }
+                );
+                console.log(err);
+                return;
+            }
+        });
+
+        var sendResponse = function() {
+            count = count + 1;
+            if (count == 2) {
+                res.json({
+                    'data': "Create success",
+                    'error': false,
+                    'errors': null
+                });
+            }
+        };
+
+    });
+  }
+
+  this.getPlan = function(userId, page, pageSize, res) {
+    connection.acquire(function(err, conn) {
+
+        page = parseInt(page) - 1;
+        pageSize = parseInt(pageSize);
+
+        var sql = 'SELECT * FROM plan WHERE id IN (SELECT id_plan FROM user_has_plan WHERE id_user = ' + userId + ')';
+
+        conn.query(sql, function (err, result) {
+            if (!err) {
+                res.json({
+                    'data': result,
+                    'error': false,
+                    'errors': null
+                });
+
+            } else {
+                res.json(
+                    {
+                        'data': null,
+                        'error': true,
+                        'errors': [{
+                            'errorCode': 9011,
+                            'errorMessage': 'Something error'
+                        }]
+                    }
+                );
+                console.log(err);
+                return;
+            }
+        });
+    });
+  }
+
+  this.getPlanSchedule = function(planId, res) {
+    connection.acquire(function(err, conn) {
+
+        conn.query('SELECT * FROM plan_schedule WHERE id_plan = ?', [planId], function (err, result) {
+            if (!err) {
+                res.json({
+                    'data': result,
+                    'error': false,
+                    'errors': null
+                });
+            } else {
+                res.json(
+                    {
+                        'data': null,
+                        'error': true,
+                        'errors': [{
+                            'errorCode': 9011,
+                            'errorMessage': 'Something error'
+                        }]
+                    }
+                );
+                console.log(err);
+                return;
             }
         });
     });
