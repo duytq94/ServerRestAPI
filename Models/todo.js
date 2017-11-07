@@ -204,9 +204,10 @@ function Todo() {
         var count = 0;
         // Random id for plan
         var id = Math.floor((Math.random() * 1000000000) + 1);
-        var sqlPlan = 'INSERT INTO plan (id, name, destination, date_go, date_back, id_background, id_user_make_plan, avatar_user_make_plan, username_user_make_plan) VALUES (' + id + ', "' + body.name + '", "' + body.destination + '", "' + body.date_go + '", "' + body.date_back + '", ' + body.id_background + ', ' + body.id_user_make_plan + '", "' + body.avatar_user_make_plan + '", "' + body.username_user_make_plan + ')';
+
+        // Write to database plan
+        var sqlPlan = 'INSERT INTO plan (id, name, destination, date_go, date_back, id_background, id_user_make_plan, avatar_user_make_plan, username_user_make_plan) VALUES (' + id + ', "' + body.name + '", "' + body.destination + '", "' + body.date_go + '", "' + body.date_back + '", ' + body.id_background + ', ' + body.id_user_make_plan + ', "' + body.avatar_user_make_plan + '", "' + body.username_user_make_plan + '")';
         conn.query(sqlPlan, function(err, result) {
-            conn.release();
             if (!err) {
                 sendResponse();
             } else {
@@ -225,14 +226,14 @@ function Todo() {
             }
         });
 
+        // Write to database plan_schedule (because a plan can has list of shcedule)
         var sqlSchedule = 'INSERT INTO plan_schedule (content, title, timestamp, id_plan) VALUES ?';
-        var values = [];
+        var schedules = [];
         for (i = 0; i < body.plan_schedule_list.length; i++) {
             var item = [body.plan_schedule_list[i].content, body.plan_schedule_list[i].title, body.plan_schedule_list[i].timestamp, id];
-            values.push(item);
+            schedules.push(item);
         }
-        conn.query(sqlSchedule, [values], function(err, result) {
-            conn.release();
+        conn.query(sqlSchedule, [schedules], function(err, result) {
             if (!err) {
                 sendResponse();
             } else {
@@ -251,9 +252,37 @@ function Todo() {
             }
         });
 
+        // Write to database user_has_plan to know which user can see these plan
+        var sqlUser = 'INSERT INTO user_has_plan (id_user, id_plan, email, username, avatar) VALUES ?';
+        var users = [];
+        users.push([body.id_user_make_plan, id, body.email_user_make_plan, body.username_user_make_plan, body.avatar_user_make_plan]);
+        for (i = 0; i < body.invited_friend_list.length; i++) {
+            var item = [body.invited_friend_list[i].id_user, id, body.invited_friend_list[i].email, body.invited_friend_list[i].username, body.invited_friend_list[i].avatar];
+            users.push(item);
+        }
+        conn.query(sqlUser, [users], function(err, result) {
+            if (!err) {
+                sendResponse();
+            } else {
+                res.json(
+                    {
+                        'data': null,
+                        'error': true,
+                        'errors': [{
+                            'errorCode': 9011,
+                            'errorMessage': 'Something error'
+                        }]
+                    }
+                );
+                console.log(err);
+                return;
+            }
+        });
+
+        // Send response when all write task complete
         var sendResponse = function() {
             count = count + 1;
-            if (count == 2) {
+            if (count == 3) {
                 res.json({
                     'data': "Create success",
                     'error': false,
@@ -324,6 +353,33 @@ function Todo() {
                 return;
             }
         });
+    });
+  }
+
+  this.getPlanUser = function(planId, res) {
+    connection.acquire(function(err, conn) {
+        conn.query('SELECT * FROM user_has_plan WHERE id_plan = ?', [planId], function (err, result) {
+            if (!err) {
+                res.json({
+                    'data': result,
+                    'error': false,
+                    'errors': null
+                });
+            } else {
+                res.json(
+                    {
+                        'data': null,
+                        'error': true,
+                        'errors': [{
+                            'errorCode': 9011,
+                            'errorMessage': 'Something error'
+                        }]
+                    }
+                );
+                console.log(err);
+                return;
+            }
+        })
     });
   }
 

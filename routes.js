@@ -47,5 +47,10 @@ module.exports = {
     app.get('/planSchedule/:planId', function(req, res) {
         todo.getPlanSchedule(req.params.planId, res);
     });
+
+    // Get list user in plan
+    app.get('/planUser/:planId', function(req, res) {
+        todo.getPlanUser(req.params.planId, res);
+    });
   }
 };
