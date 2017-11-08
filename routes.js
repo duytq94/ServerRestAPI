@@ -4,18 +4,8 @@ module.exports = {
   configure: function(app) {
 
     // Get history of chat
-    app.get('/history/:groupId', function(req, res) {
-        todo.getHistory(req.params.groupId, req.query.page, req.query.pageSize, res);
-    });
-
-    // Get list status users online or offline
-    app.get('/status/:groupId', function(req, res) {
-        todo.getStatus(req.params.groupId, res);
-    });
-
-    // Get list last location at map
-    app.get('/last_location/:groupId', function(req, res) {
-        todo.getLastLocation(req.params.groupId, res);
+    app.get('/history/:planId', function(req, res) {
+        todo.getHistory(req.params.planId, req.query.page, req.query.pageSize, res);
     });
 
     // Get list of deal

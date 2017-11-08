@@ -7,7 +7,7 @@ function Todo() {
     	page = parseInt(page) - 1;
     	pageSize = parseInt(pageSize);
 
-        conn.query('SELECT * FROM (SELECT * FROM archive WHERE to_group = ? ORDER BY id DESC LIMIT ?, ?) sub ORDER BY id ASC', [groupId, page * pageSize, pageSize], function(err, result) {
+        conn.query('SELECT * FROM (SELECT * FROM archive WHERE id_plan = ? ORDER BY id DESC LIMIT ?, ?) sub ORDER BY id ASC', [groupId, page * pageSize, pageSize], function(err, result) {
             conn.release();
          
             if (!err) {
@@ -115,63 +115,6 @@ function Todo() {
     });
   }
 
-  this.getStatus = function(groupId, res) {
-    connection.acquire(function(err, conn) {
-        conn.query('SELECT * FROM user_chat WHERE to_group = ? ', [groupId], function(err, result) {
-            conn.release();
-            if (!err) {
-                 res.json(
-                    {
-                        'data': result,
-                        'error': false,
-                        'errors': null
-                    }
-                );
-       
-            } else {
-                res.json(
-                    {
-                        'data': null,
-                        'error': true,
-                        'errors': [{
-                            'errorCode': 9011,
-                            'errorMessage': 'Something error'
-                        }]
-                    }
-                );
-                console.log(err);
-            }
-        });
-    });
-  }
-
-  this.getLastLocation = function(groupId, res) {
-    connection.acquire(function(err, conn) {
-        conn.query('SELECT * FROM last_location WHERE to_group = ?', [groupId], function(err, result) {
-            conn.release();
-            if (!err) {
-                res.json({
-                    'data': result,
-                    'error': false,
-                    'errors': null
-                });
-            } else {
-                res.json(
-                    {
-                        'data': null,
-                        'error': true,
-                        'errors': [{
-                            'errorCode': 9011,
-                            'errorMessage': 'Something error'
-                        }]
-                    }
-                );
-                console.log(err);
-            }
-        });
-    });
-  }
-
   this.updateTrendCount = function(body, res) {
     connection.acquire(function(err, conn) {
         conn.query('UPDATE trend SET ? WHERE id = ?', [body, body.id], function(err, result) {
@@ -252,8 +195,8 @@ function Todo() {
             }
         });
 
-        // Write to database user_has_plan to know which user can see these plan
-        var sqlUser = 'INSERT INTO user_has_plan (id_user, id_plan, email, username, avatar) VALUES ?';
+        // Write to database user_in_plan to know which user can see these plan
+        var sqlUser = 'INSERT INTO user_in_plan (id_user, id_plan, email, username, avatar) VALUES ?';
         var users = [];
         users.push([body.id_user_make_plan, id, body.email_user_make_plan, body.username_user_make_plan, body.avatar_user_make_plan]);
         for (i = 0; i < body.invited_friend_list.length; i++) {
@@ -300,7 +243,7 @@ function Todo() {
         page = parseInt(page) - 1;
         pageSize = parseInt(pageSize);
 
-        var sql = 'SELECT * FROM plan WHERE id IN (SELECT id_plan FROM user_has_plan WHERE id_user = ' + userId + ')';
+        var sql = 'SELECT * FROM plan WHERE id IN (SELECT id_plan FROM user_in_plan WHERE id_user = ' + userId + ')';
 
         conn.query(sql, function (err, result) {
             if (!err) {
@@ -358,7 +301,7 @@ function Todo() {
 
   this.getPlanUser = function(planId, res) {
     connection.acquire(function(err, conn) {
-        conn.query('SELECT * FROM user_has_plan WHERE id_plan = ?', [planId], function (err, result) {
+        conn.query('SELECT * FROM user_in_plan WHERE id_plan = ?', [planId], function (err, result) {
             if (!err) {
                 res.json({
                     'data': result,
