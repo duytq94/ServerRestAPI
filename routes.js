@@ -28,6 +28,11 @@ module.exports = {
         todo.createPlan(req.body, res);
     });
 
+    // Update a plan
+    app.post('/plan/update/:planId', function(req, res) {
+        todo.updatePlan(req.body, res);
+    });
+
     // Get list plan
     app.get('/plan/:userId', function(req, res) {
         todo.getPlan(req.params.userId, req.query.page, req.query.pageSize, res);
@@ -42,5 +47,6 @@ module.exports = {
     app.get('/planUser/:planId', function(req, res) {
         todo.getPlanUser(req.params.planId, res);
     });
+
   }
 };
