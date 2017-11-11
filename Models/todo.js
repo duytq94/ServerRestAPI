@@ -177,6 +177,7 @@ function Todo() {
                     }
                 );
                 console.log(err);
+                conn.release();
                 return;
             }
         });
@@ -203,6 +204,7 @@ function Todo() {
                     }
                 );
                 console.log(err);
+                conn.release();
                 return;
             }
         });
@@ -230,6 +232,7 @@ function Todo() {
                     }
                 );
                 console.log(err);
+                conn.release();
                 return;
             }
         });
@@ -274,6 +277,7 @@ function Todo() {
                     }
                 );
                 console.log(err);
+                conn.release();
                 return;
             }
         });
@@ -304,6 +308,7 @@ function Todo() {
                             }
                         );
                         console.log(err);
+                        conn.release();
                         return;
                     }
                 });
@@ -318,6 +323,8 @@ function Todo() {
                         }]
                     }
                 );
+                console.log(err);
+                conn.release();
                 return;
             }
         });
@@ -348,6 +355,7 @@ function Todo() {
                             }
                         );
                         console.log(err);
+                        conn.release();
                         return;
                     }
                 });
@@ -362,6 +370,8 @@ function Todo() {
                         }]
                     }
                 );
+                console.log(err);
+                conn.release();
                 return;
             }
         });
@@ -374,6 +384,120 @@ function Todo() {
             if (count == 3) {
                 res.json({
                     'data': "Update success",
+                    'error': false,
+                    'errors': null
+                });
+                conn.release();
+            }
+        };
+
+    });
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------//
+
+this.cancelPlan = function(userId, planId, res) {
+    connection.acquire(function (err, conn) {
+        conn.query('DELETE FROM user_in_plan WHERE id_plan = ? AND id_user = ?', [planId, userId], function (err, result) {
+            conn.release();
+            if (!err) {
+                res.json({
+                    'data': "Cancel success",
+                    'error': false,
+                    'errors': null
+                });
+            } else {
+                res.json(
+                    {
+                        'data': null,
+                        'error': true,
+                        'errors': [{
+                            'errorCode': 9011,
+                            'errorMessage': 'Something error'
+                        }]
+                    }
+                );
+                console.log(err);
+            }
+        });
+    });
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------//
+
+this.removePlan = function(planId, res) {
+    connection.acquire(function (err, conn) {
+        var count = 0;
+        
+        conn.query('DELETE FROM plan WHERE id = ?', [planId], function(err, result) {
+            if (!err) {
+                sendResponse();
+            } else {
+                res.json(
+                    {
+                        'data': null,
+                        'error': true,
+                        'errors': [{
+                            'errorCode': 9011,
+                            'errorMessage': 'Something error'
+                        }]
+                    }
+                );
+                console.log(err);
+                conn.release();
+                return;
+            }
+        });
+
+
+        conn.query('DELETE FROM plan_schedule WHERE id_plan = ?', [planId], function(err, result) {
+            if (!err) {
+                sendResponse();
+            } else {
+                res.json(
+                    {
+                        'data': null,
+                        'error': true,
+                        'errors': [{
+                            'errorCode': 9011,
+                            'errorMessage': 'Something error'
+                        }]
+                    }
+                );
+                console.log(err);
+                conn.release();
+                return;
+            }
+        });
+
+
+        conn.query('DELETE FROM user_in_plan WHERE id_plan = ?', [planId], function(err, result) {
+            if (!err) {
+                sendResponse();
+            } else {
+                res.json(
+                    {
+                        'data': null,
+                        'error': true,
+                        'errors': [{
+                            'errorCode': 9011,
+                            'errorMessage': 'Something error'
+                        }]
+                    }
+                );
+                console.log(err);
+                conn.release();
+                return;
+            }
+        });
+
+        // Send response when all remove task complete
+        var sendResponse = function() {
+            count = count + 1;
+            if (count == 3) {
+                res.json({
+                    'data': "Remove success",
                     'error': false,
                     'errors': null
                 });

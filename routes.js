@@ -33,6 +33,16 @@ module.exports = {
         todo.updatePlan(req.body, res);
     });
 
+    // Cancel a plan (for member)
+    app.delete('/plan/cancel', function(req, res) {
+        todo.cancelPlan(req.query.userId, req.query.planId, res);
+    });
+
+    // Remove a plan (for owner)
+    app.delete('/plan/remove', function(req, res) {
+        todo.removePlan(req.query.planId, res);
+    });
+
     // Get list plan
     app.get('/plan/:userId', function(req, res) {
         todo.getPlan(req.params.userId, req.query.page, req.query.pageSize, res);
