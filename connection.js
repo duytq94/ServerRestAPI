@@ -8,7 +8,7 @@ function Connection() {
       connectionLimit: 100,
       host  : 'localhost',
       user  : 'root',
-      password: '123456',
+      password: 'Tu0denchin_123',
       database: 'chat_io'
     });
   };
