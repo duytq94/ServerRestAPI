@@ -80,17 +80,20 @@ function Todo() {
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------//
 
-    this.getTrend = function(where, page, pageSize, res) {
+    this.getTrend = function(where, season, type, page, pageSize, res) {
     connection.acquire(function(err, conn) {
 
         page = parseInt(page) - 1;
         pageSize = parseInt(pageSize);
 
-        var strQuery;
-        if (where != "") {
-            strQuery = 'SELECT * FROM trend WHERE title LIKE "%' + where + '%" ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+        if (season != -1 && type != -1) {
+            var strQuery = 'SELECT * FROM trend WHERE title LIKE "%' + where + '%" AND season = ' + season + ' AND type = ' + type + ' ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+        } else if (season == -1 && type != -1) {
+            var strQuery = 'SELECT * FROM trend WHERE title LIKE "%' + where + '%" AND type = ' + type + ' ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+        } else if (season != -1 && type == -1) {
+            var strQuery = 'SELECT * FROM trend WHERE title LIKE "%' + where + '%" AND season = ' + season + ' ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
         } else {
-            strQuery = 'SELECT * FROM trend ORDER BY count_view DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+            var strQuery = 'SELECT * FROM trend WHERE title LIKE "%' + where + '%" ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
         }
 
         conn.query(strQuery, function(err, result) {

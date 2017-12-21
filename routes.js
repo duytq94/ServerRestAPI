@@ -2,7 +2,6 @@ var todo = require('./Models/todo');
   
 module.exports = {
   configure: function(app) {
-
     // Get history of chat
     app.get('/history/:planId', function(req, res) {
         todo.getHistory(req.params.planId, req.query.page, req.query.pageSize, res);
@@ -15,7 +14,7 @@ module.exports = {
 
     // Get list of trend
     app.get('/trend', function(req, res) {
-        todo.getTrend(req.query.where, req.query.page, req.query.pageSize, res);
+        todo.getTrend(req.query.where, req.query.season, req.query.type, req.query.page, req.query.pageSize, res);
     });
 
     // Update count view of trend
