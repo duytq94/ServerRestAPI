@@ -519,7 +519,7 @@ this.removePlan = function(planId, res) {
         page = parseInt(page) - 1;
         pageSize = parseInt(pageSize);
 
-        var sql = 'SELECT * FROM plan WHERE id IN (SELECT id_plan FROM user_in_plan WHERE id_user = ' + userId + ')';
+        var sql = 'SELECT * FROM plan WHERE id IN (SELECT id_plan FROM user_in_plan WHERE id_user = ' + userId + ') ORDER BY id DESC';
 
         conn.query(sql, function (err, result) {
             conn.release();
