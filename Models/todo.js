@@ -160,11 +160,9 @@ function Todo() {
   this.createPlan = function(body, res) {
     connection.acquire(function(err, conn) {
         var count = 0;
-        // Random id for plan
-        var id = Math.floor((Math.random() * 1000000000) + 1);
 
         // Write to database plan
-        var sqlPlan = 'INSERT INTO plan (id, name, destination, date_go, date_back, id_background, id_user_make_plan, avatar_user_make_plan, username_user_make_plan, email_user_make_plan) VALUES (' + id + ', "' + body.name + '", "' + body.destination + '", "' + body.date_go + '", "' + body.date_back + '", ' + body.id_background + ', ' + body.id_user_make_plan + ', "' + body.avatar_user_make_plan + '", "' + body.username_user_make_plan + '", "' + body.email_user_make_plan + '")';
+        var sqlPlan = 'INSERT INTO plan (id, name, destination, date_go, timestamp_date_go, date_back, timestamp_date_back, id_background, id_user_make_plan, avatar_user_make_plan, username_user_make_plan, email_user_make_plan) VALUES (' + body.id + ', "' + body.name + '", "' + body.destination + '", "' + body.date_go + '", ' + body.timestamp_date_go + ', "' + body.date_back + '", ' + body.timestamp_date_back + ', ' + body.id_background + ', ' + body.id_user_make_plan + ', "' + body.avatar_user_make_plan + '", "' + body.username_user_make_plan + '", "' + body.email_user_make_plan + '")';
         conn.query(sqlPlan, function(err, result) {
             if (!err) {
                 sendResponse();
@@ -189,7 +187,7 @@ function Todo() {
         var sqlSchedule = 'INSERT INTO plan_schedule (content, title, timestamp, id_plan) VALUES ?';
         var schedules = [];
         for (i = 0; i < body.plan_schedule_list.length; i++) {
-            var item = [body.plan_schedule_list[i].content, body.plan_schedule_list[i].title, body.plan_schedule_list[i].timestamp, id];
+            var item = [body.plan_schedule_list[i].content, body.plan_schedule_list[i].title, body.plan_schedule_list[i].timestamp, body.id];
             schedules.push(item);
         }
         conn.query(sqlSchedule, [schedules], function(err, result) {
@@ -215,9 +213,9 @@ function Todo() {
         // Write to database user_in_plan to know which user can see these plan
         var sqlUser = 'INSERT INTO user_in_plan (id_user, id_plan, email, username, avatar) VALUES ?';
         var users = [];
-        users.push([body.id_user_make_plan, id, body.email_user_make_plan, body.username_user_make_plan, body.avatar_user_make_plan]);
+        users.push([body.id_user_make_plan, body.id, body.email_user_make_plan, body.username_user_make_plan, body.avatar_user_make_plan]);
         for (i = 0; i < body.invited_friend_list.length; i++) {
-            var item = [body.invited_friend_list[i].id_user, id, body.invited_friend_list[i].email, body.invited_friend_list[i].username, body.invited_friend_list[i].avatar];
+            var item = [body.invited_friend_list[i].id_user, body.id, body.invited_friend_list[i].email, body.invited_friend_list[i].username, body.invited_friend_list[i].avatar];
             users.push(item);
         }
         conn.query(sqlUser, [users], function(err, result) {
@@ -513,14 +511,56 @@ this.removePlan = function(planId, res) {
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------//
 
-  this.getPlan = function(userId, page, pageSize, res) {
+  this.getPlan = function(userId, title, type, expired, currentTimestamp, page, pageSize, res) {
     connection.acquire(function(err, conn) {
 
         page = parseInt(page) - 1;
         pageSize = parseInt(pageSize);
 
-        var sql = 'SELECT * FROM plan WHERE id IN (SELECT id_plan FROM user_in_plan WHERE id_user = ' + userId + ') ORDER BY id ASC';
-
+        if (type == 2) {
+            switch (expired) {
+                case '3':
+                    var sql = 'SELECT * FROM plan WHERE id IN (SELECT id_plan FROM user_in_plan WHERE id_user = ' + userId + ') AND name LIKE "%' + title + '%" AND id_user_make_plan NOT LIKE "%' + userId + '%" AND timestamp_date_back < ' + currentTimestamp + ' ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+                    break;
+                case '2':
+                    var sql = 'SELECT * FROM plan WHERE id IN (SELECT id_plan FROM user_in_plan WHERE id_user = ' + userId + ') AND name LIKE "%' + title + '%" AND id_user_make_plan NOT LIKE "%' + userId + '%" AND timestamp_date_go > ' + currentTimestamp + ' ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+                    break;
+                case '1':
+                    var sql = 'SELECT * FROM plan WHERE id IN (SELECT id_plan FROM user_in_plan WHERE id_user = ' + userId + ') AND name LIKE "%' + title + '%" AND id_user_make_plan NOT LIKE "%' + userId + '%" AND timestamp_date_back >= ' + currentTimestamp + ' AND timestamp_date_go <= ' + currentTimestamp + ' ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+                    break;
+                default:
+                    var sql = 'SELECT * FROM plan WHERE id IN (SELECT id_plan FROM user_in_plan WHERE id_user = ' + userId + ') AND name LIKE "%' + title + '%" AND id_user_make_plan NOT LIKE "%' + userId + '%" ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+            }
+        } else if (type == 1) {
+            switch (expired) {
+                case '3':
+                    var sql = 'SELECT * FROM plan WHERE id IN (SELECT id_plan FROM user_in_plan WHERE id_user = ' + userId + ') AND name LIKE "%' + title + '%" AND id_user_make_plan LIKE "%' + userId + '%" AND timestamp_date_back < ' + currentTimestamp + ' ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+                    break;
+                case '2':
+                    var sql = 'SELECT * FROM plan WHERE id IN (SELECT id_plan FROM user_in_plan WHERE id_user = ' + userId + ') AND name LIKE "%' + title + '%" AND id_user_make_plan LIKE "%' + userId + '%" AND timestamp_date_go > ' + currentTimestamp + ' ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+                    break;
+                case '1':
+                    var sql = 'SELECT * FROM plan WHERE id IN (SELECT id_plan FROM user_in_plan WHERE id_user = ' + userId + ') AND name LIKE "%' + title + '%" AND id_user_make_plan LIKE "%' + userId + '%" AND timestamp_date_back >= ' + currentTimestamp + ' AND timestamp_date_go <= ' + currentTimestamp + ' ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+                    break;
+                default:
+                    var sql = 'SELECT * FROM plan WHERE id IN (SELECT id_plan FROM user_in_plan WHERE id_user = ' + userId + ') AND name LIKE "%' + title + '%" AND id_user_make_plan LIKE "%' + userId + '%" ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+            }
+        } else {
+            switch (expired) {
+                case '3':
+                    var sql = 'SELECT * FROM plan WHERE id IN (SELECT id_plan FROM user_in_plan WHERE id_user = ' + userId + ') AND name LIKE "%' + title + '%" AND timestamp_date_back < ' + currentTimestamp + ' ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+                    break;
+                case '2':
+                    var sql = 'SELECT * FROM plan WHERE id IN (SELECT id_plan FROM user_in_plan WHERE id_user = ' + userId + ') AND name LIKE "%' + title + '%" AND timestamp_date_go > ' + currentTimestamp + ' ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+                    break;
+                case '1':
+                    var sql = 'SELECT * FROM plan WHERE id IN (SELECT id_plan FROM user_in_plan WHERE id_user = ' + userId + ') AND name LIKE "%' + title + '%" AND timestamp_date_back >= ' + currentTimestamp + ' AND timestamp_date_go <= ' + currentTimestamp + ' ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+                    break;
+                default:
+                    var sql = 'SELECT * FROM plan WHERE id IN (SELECT id_plan FROM user_in_plan WHERE id_user = ' + userId + ') AND name LIKE "%' + title + '%" ORDER BY id DESC LIMIT ' + page * pageSize + ', ' + pageSize;
+            }
+        }
+       
         conn.query(sql, function (err, result) {
             conn.release();
             if (!err) {

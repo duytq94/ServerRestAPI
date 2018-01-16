@@ -44,7 +44,7 @@ module.exports = {
 
     // Get list plan
     app.get('/plan/:userId', function(req, res) {
-        todo.getPlan(req.params.userId, req.query.page, req.query.pageSize, res);
+        todo.getPlan(req.params.userId, req.query.title, req.query.type, req.query.expired, req.query.currentTimestamp, req.query.page, req.query.pageSize, res);
     });
 
     // Get list plan_schedule from plan id
