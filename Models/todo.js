@@ -261,7 +261,7 @@ function Todo() {
         var count = 0;
 
         // Update to database plan
-        var sqlPlan = 'UPDATE plan SET name = "' + body.name + '", destination = "' + body.destination + '", date_go = "' + body.date_go + '", date_back = "' + body.date_back + '", id_background = ' + body.id_background + ' WHERE id = ' + body.id;
+        var sqlPlan = 'UPDATE plan SET name = "' + body.name + '", destination = "' + body.destination + '", date_go = "' + body.date_go + '", timestamp_date_go = ' + body.timestamp_date_go + ', date_back = "' + body.date_back + '", timestamp_date_back = ' + body.timestamp_date_back + ', id_background = ' + body.id_background + ' WHERE id = ' + body.id;
 
         conn.query(sqlPlan, function(err, result) {
             if (!err) {
