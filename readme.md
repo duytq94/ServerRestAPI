@@ -7,6 +7,7 @@ This is an simple server API Restful
 * Host: localhost
 * User: root
 * Port: 3001
+* Password: 'Tu0denchin_123'
 
 ## Installing
 
