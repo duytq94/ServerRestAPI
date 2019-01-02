@@ -2,7 +2,7 @@
 
 This is an simple server API Restful
 
-## Infor connect
+## Info to connect
 
 * Host: localhost
 * User: root
