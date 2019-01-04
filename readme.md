@@ -11,13 +11,18 @@ This is an simple server API Restful
 
 ## Installing
 
-Node:
+NodeJS & NPM:
 ```
 apt-get install nodejs
 apt-get install npm
 ```
 
-MySql:
+PhpMyAdmin (if you want to manage database, require install MySQL server & Apache at first):
+```
+apt-get install phpmyadmin
+```
+
+MySQL server:
 ```
 apt-get install mysql-server
 If you have error "Cannot find module "mysql" -> npm install mysql
@@ -28,8 +33,7 @@ Apache2:
 apt-get install apache2
 ```
 
-PhpMyAdmin:
+## Run
 ```
-apt-get install phpmyadmin
-(remember check apache2)
+node server_api.js
 ```
